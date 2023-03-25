@@ -15,11 +15,15 @@ func main() {
 		panic(err)
 	}
 
-	r := gin.Default()
-	r.GET("/isPresenceDetected", pkg.IsPresenceDetected)
-	r.GET("/isSensorEnabled", pkg.IsSensorEnabled)
-	r.POST("/setPresenceDetected", pkg.SetPresenceDetected)
-	r.POST("/setSensorEnabled", pkg.SetSensorEnabled)
+	// Initialization of the sensor
+	presenceSensor := pkg.PresenceSensor{SensorEnabled: false, PresenceDetected: false}
 
-	log.Fatal(r.Run(viper.GetString("ADDRESS")))
+	presenceSensorService := pkg.NewPresenceSensorService(&presenceSensor)
+	presenceSensorHandler := pkg.NewPresenceSensorHandler(presenceSensorService)
+	r := gin.Default()
+	pkg.SetupRouter(r, presenceSensorHandler)
+
+	serviceAddress := viper.GetString("ADDRESS")
+	log.Printf("Starting service at %s\n", serviceAddress)
+	log.Fatal(r.Run(serviceAddress))
 }
