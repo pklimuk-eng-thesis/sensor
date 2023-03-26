@@ -7,15 +7,15 @@ WORKDIR /src
 COPY . .
 RUN go mod download
 
-RUN go build -o presenceSensor main.go
+RUN go build -o sensor main.go
 
 
 FROM scratch
 
 WORKDIR /
 
-COPY --from=builder /src/presenceSensor /presenceSensor
+COPY --from=builder /src/sensor /sensor
 
 EXPOSE 8080
 
-CMD ["/presenceSensor"]
+CMD ["/sensor"]

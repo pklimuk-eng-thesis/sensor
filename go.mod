@@ -1,4 +1,4 @@
-module github.com/pklimuk-eng-thesis/presence-sensor
+module github.com/pklimuk-eng-thesis/sensor
 
 go 1.20
 

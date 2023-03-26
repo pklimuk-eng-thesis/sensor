@@ -5,17 +5,17 @@ import (
 	"os"
 
 	"github.com/gin-gonic/gin"
-	"github.com/pklimuk-eng-thesis/presence-sensor/pkg"
+	"github.com/pklimuk-eng-thesis/sensor/pkg"
 )
 
 func main() {
 	// Initialization of the sensor
-	presenceSensor := pkg.PresenceSensor{SensorEnabled: false, PresenceDetected: false}
+	sensor := pkg.Sensor{Enabled: false, Detected: false}
 
-	presenceSensorService := pkg.NewPresenceSensorService(&presenceSensor)
-	presenceSensorHandler := pkg.NewPresenceSensorHandler(presenceSensorService)
+	sensorService := pkg.NewSensorService(&sensor)
+	sensorHandler := pkg.NewSensorHandler(sensorService)
 	r := gin.Default()
-	pkg.SetupRouter(r, presenceSensorHandler)
+	pkg.SetupRouter(r, sensorHandler)
 
 	// Gets a service address from the environment variable or uses the default one
 	// serviceAddress := viper.GetString("ADDRESS")

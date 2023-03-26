@@ -14,7 +14,7 @@ type mockService struct {
 	mock.Mock
 }
 
-func (m *mockService) IsPresenceDetected() (bool, error) {
+func (m *mockService) Detected() (bool, error) {
 	args := m.Called()
 	return args.Bool(0), args.Error(1)
 }
@@ -24,7 +24,7 @@ func (m *mockService) IsSensorEnabled() bool {
 	return args.Bool(0)
 }
 
-func (m *mockService) TogglePresenceDetected() (bool, error) {
+func (m *mockService) ToggleDetected() (bool, error) {
 	args := m.Called()
 	return args.Bool(0), args.Error(1)
 }
@@ -34,17 +34,17 @@ func (m *mockService) ToggleSensorEnabled() bool {
 	return args.Bool(0)
 }
 
-func TestPresenceSensorHandler_IsPresenceDetected_Success(t *testing.T) {
+func TestSensorHandler_Detected_Success(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 	mockSvc := new(mockService)
-	handler := NewPresenceSensorHandler(mockSvc)
+	handler := NewSensorHandler(mockSvc)
 
 	r := gin.Default()
-	r.GET("/presenceDetected", handler.IsPresenceDetected)
+	r.GET(detectedEndpoint, handler.Detected)
 
 	t.Run("success", func(t *testing.T) {
-		mockSvc.On("IsPresenceDetected").Return(true, nil)
-		req, _ := http.NewRequest(http.MethodGet, "/presenceDetected", nil)
+		mockSvc.On("Detected").Return(true, nil)
+		req, _ := http.NewRequest(http.MethodGet, detectedEndpoint, nil)
 		w := httptest.NewRecorder()
 		r.ServeHTTP(w, req)
 
@@ -53,17 +53,17 @@ func TestPresenceSensorHandler_IsPresenceDetected_Success(t *testing.T) {
 	})
 }
 
-func TestPresenceSensorHandler_IsPresenceDetected_Error(t *testing.T) {
+func TestSensorHandler_Detected_Error(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 	mockSvc := new(mockService)
-	handler := NewPresenceSensorHandler(mockSvc)
+	handler := NewSensorHandler(mockSvc)
 
 	r := gin.Default()
-	r.GET("/presenceDetected", handler.IsPresenceDetected)
+	r.GET(detectedEndpoint, handler.Detected)
 
 	t.Run("service error", func(t *testing.T) {
-		mockSvc.On("IsPresenceDetected").Return(false, ErrSensorIsDisabled)
-		req, _ := http.NewRequest(http.MethodGet, "/presenceDetected", nil)
+		mockSvc.On("Detected").Return(false, ErrSensorIsDisabled)
+		req, _ := http.NewRequest(http.MethodGet, detectedEndpoint, nil)
 		w := httptest.NewRecorder()
 		r.ServeHTTP(w, req)
 
@@ -72,17 +72,17 @@ func TestPresenceSensorHandler_IsPresenceDetected_Error(t *testing.T) {
 	})
 }
 
-func TestPresenceSensorHandler_IsSensorEnabled(t *testing.T) {
+func TestSensorHandler_IsSensorEnabled(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 	mockSvc := new(mockService)
-	handler := NewPresenceSensorHandler(mockSvc)
+	handler := NewSensorHandler(mockSvc)
 
 	r := gin.Default()
-	r.GET("/sensorEnabled", handler.IsSensorEnabled)
+	r.GET(enabledEndpoint, handler.IsSensorEnabled)
 
 	t.Run("success", func(t *testing.T) {
 		mockSvc.On("IsSensorEnabled").Return(true)
-		req, _ := http.NewRequest(http.MethodGet, "/sensorEnabled", nil)
+		req, _ := http.NewRequest(http.MethodGet, enabledEndpoint, nil)
 		w := httptest.NewRecorder()
 		r.ServeHTTP(w, req)
 
@@ -91,17 +91,17 @@ func TestPresenceSensorHandler_IsSensorEnabled(t *testing.T) {
 	})
 }
 
-func TestPresenceSensorHandler_TogglePresenceDetected_Success(t *testing.T) {
+func TestSensorHandler_ToggleDetected_Success(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 	mockSvc := new(mockService)
-	handler := NewPresenceSensorHandler(mockSvc)
+	handler := NewSensorHandler(mockSvc)
 
 	r := gin.Default()
-	r.POST("/presenceDetected", handler.TogglePresenceDetected)
+	r.POST(detectedEndpoint, handler.ToggleDetected)
 
 	t.Run("success", func(t *testing.T) {
-		mockSvc.On("TogglePresenceDetected").Return(true, nil)
-		req, _ := http.NewRequest(http.MethodPost, "/presenceDetected", nil)
+		mockSvc.On("ToggleDetected").Return(true, nil)
+		req, _ := http.NewRequest(http.MethodPost, detectedEndpoint, nil)
 		w := httptest.NewRecorder()
 		r.ServeHTTP(w, req)
 
@@ -110,17 +110,17 @@ func TestPresenceSensorHandler_TogglePresenceDetected_Success(t *testing.T) {
 	})
 }
 
-func TestPresenceSensorHandler_TogglePresenceDetected_Error(t *testing.T) {
+func TestSensorHandler_ToggleDetected_Error(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 	mockSvc := new(mockService)
-	handler := NewPresenceSensorHandler(mockSvc)
+	handler := NewSensorHandler(mockSvc)
 
 	r := gin.Default()
-	r.POST("/presenceDetected", handler.TogglePresenceDetected)
+	r.POST(detectedEndpoint, handler.ToggleDetected)
 
 	t.Run("service error", func(t *testing.T) {
-		mockSvc.On("TogglePresenceDetected").Return(false, ErrSensorIsDisabled)
-		req, _ := http.NewRequest(http.MethodPost, "/presenceDetected", nil)
+		mockSvc.On("ToggleDetected").Return(false, ErrSensorIsDisabled)
+		req, _ := http.NewRequest(http.MethodPost, detectedEndpoint, nil)
 		w := httptest.NewRecorder()
 		r.ServeHTTP(w, req)
 
@@ -129,17 +129,17 @@ func TestPresenceSensorHandler_TogglePresenceDetected_Error(t *testing.T) {
 	})
 }
 
-func TestPresenceSensorHandler_ToggleSensorEnabled(t *testing.T) {
+func TestSensorHandler_ToggleSensorEnabled(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 	mockSvc := new(mockService)
-	handler := NewPresenceSensorHandler(mockSvc)
+	handler := NewSensorHandler(mockSvc)
 
 	r := gin.Default()
-	r.POST("/sensorEnabled", handler.ToggleSensorEnabled)
+	r.POST(enabledEndpoint, handler.ToggleSensorEnabled)
 
 	t.Run("success", func(t *testing.T) {
 		mockSvc.On("ToggleSensorEnabled").Return(true)
-		req, _ := http.NewRequest(http.MethodPost, "/sensorEnabled", nil)
+		req, _ := http.NewRequest(http.MethodPost, enabledEndpoint, nil)
 		w := httptest.NewRecorder()
 		r.ServeHTTP(w, req)
 
