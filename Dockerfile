@@ -15,8 +15,7 @@ FROM scratch
 WORKDIR /
 
 COPY --from=builder /src/presenceSensor /presenceSensor
-COPY --from=builder /src/.env /.env
 
 EXPOSE 8080
 
-ENTRYPOINT ["/presenceSensor"]
+CMD ["/presenceSensor"]
