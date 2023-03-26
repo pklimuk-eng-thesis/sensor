@@ -1,4 +1,4 @@
-package pkg
+package http
 
 import (
 	"net/http"
@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/gin-gonic/gin"
+	sService "github.com/pklimuk-eng-thesis/sensor/pkg/service"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
@@ -62,13 +63,13 @@ func TestSensorHandler_Detected_Error(t *testing.T) {
 	r.GET(detectedEndpoint, handler.Detected)
 
 	t.Run("service error", func(t *testing.T) {
-		mockSvc.On("Detected").Return(false, ErrSensorIsDisabled)
+		mockSvc.On("Detected").Return(false, sService.ErrSensorIsDisabled)
 		req, _ := http.NewRequest(http.MethodGet, detectedEndpoint, nil)
 		w := httptest.NewRecorder()
 		r.ServeHTTP(w, req)
 
 		assert.Equal(t, http.StatusBadRequest, w.Code)
-		assert.Equal(t, ErrSensorIsDisabled.Error(), w.Body.String())
+		assert.Equal(t, sService.ErrSensorIsDisabled.Error(), w.Body.String())
 	})
 }
 
@@ -119,13 +120,13 @@ func TestSensorHandler_ToggleDetected_Error(t *testing.T) {
 	r.POST(detectedEndpoint, handler.ToggleDetected)
 
 	t.Run("service error", func(t *testing.T) {
-		mockSvc.On("ToggleDetected").Return(false, ErrSensorIsDisabled)
+		mockSvc.On("ToggleDetected").Return(false, sService.ErrSensorIsDisabled)
 		req, _ := http.NewRequest(http.MethodPost, detectedEndpoint, nil)
 		w := httptest.NewRecorder()
 		r.ServeHTTP(w, req)
 
 		assert.Equal(t, http.StatusBadRequest, w.Code)
-		assert.Equal(t, ErrSensorIsDisabled.Error(), w.Body.String())
+		assert.Equal(t, sService.ErrSensorIsDisabled.Error(), w.Body.String())
 	})
 }
 

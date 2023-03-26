@@ -2,12 +2,14 @@ package pkg
 
 import (
 	"testing"
+
+	"github.com/pklimuk-eng-thesis/sensor/pkg/domain"
 )
 
-var sensorEnabledDetected = &Sensor{Enabled: true, Detected: true}
-var sensorEnabledNotDetected = &Sensor{Enabled: true, Detected: false}
-var sensorDisabledDetected = &Sensor{Enabled: false, Detected: true}
-var sensorDisabledNotDetected = &Sensor{Enabled: false, Detected: false}
+var sensorEnabledDetected = &domain.Sensor{Enabled: true, Detected: true}
+var sensorEnabledNotDetected = &domain.Sensor{Enabled: true, Detected: false}
+var sensorDisabledDetected = &domain.Sensor{Enabled: false, Detected: true}
+var sensorDisabledNotDetected = &domain.Sensor{Enabled: false, Detected: false}
 
 func Test_SensorService_Detected(t *testing.T) {
 	tests := []struct {

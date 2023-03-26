@@ -5,17 +5,19 @@ import (
 	"os"
 
 	"github.com/gin-gonic/gin"
-	"github.com/pklimuk-eng-thesis/sensor/pkg"
+	"github.com/pklimuk-eng-thesis/sensor/pkg/domain"
+	sHttp "github.com/pklimuk-eng-thesis/sensor/pkg/http"
+	sService "github.com/pklimuk-eng-thesis/sensor/pkg/service"
 )
 
 func main() {
 	// Initialization of the sensor
-	sensor := pkg.Sensor{Enabled: false, Detected: false}
+	sensor := domain.Sensor{Enabled: false, Detected: false}
 
-	sensorService := pkg.NewSensorService(&sensor)
-	sensorHandler := pkg.NewSensorHandler(sensorService)
+	sensorService := sService.NewSensorService(&sensor)
+	sensorHandler := sHttp.NewSensorHandler(sensorService)
 	r := gin.Default()
-	pkg.SetupRouter(r, sensorHandler)
+	sHttp.SetupRouter(r, sensorHandler)
 
 	// Gets a service address from the environment variable or uses the default one
 	// serviceAddress := viper.GetString("ADDRESS")

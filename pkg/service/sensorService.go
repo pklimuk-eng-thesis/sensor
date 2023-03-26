@@ -2,6 +2,8 @@ package pkg
 
 import (
 	"errors"
+
+	"github.com/pklimuk-eng-thesis/sensor/pkg/domain"
 )
 
 var ErrSensorIsDisabled = errors.New("Sensor is disabled")
@@ -14,10 +16,10 @@ type SensorService interface {
 }
 
 type sensorService struct {
-	sensor *Sensor
+	sensor *domain.Sensor
 }
 
-func NewSensorService(sensor *Sensor) SensorService {
+func NewSensorService(sensor *domain.Sensor) SensorService {
 	return &sensorService{
 		sensor: sensor,
 	}

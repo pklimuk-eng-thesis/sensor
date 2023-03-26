@@ -1,16 +1,17 @@
-package pkg
+package http
 
 import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	sService "github.com/pklimuk-eng-thesis/sensor/pkg/service"
 )
 
 type SensorHandler struct {
-	service SensorService
+	service sService.SensorService
 }
 
-func NewSensorHandler(service SensorService) *SensorHandler {
+func NewSensorHandler(service sService.SensorService) *SensorHandler {
 	return &SensorHandler{service}
 }
 
