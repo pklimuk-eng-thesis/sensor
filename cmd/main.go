@@ -19,8 +19,6 @@ func main() {
 	r := gin.Default()
 	sHttp.SetupRouter(r, sensorHandler)
 
-	// Gets a service address from the environment variable or uses the default one
-	// serviceAddress := viper.GetString("ADDRESS")
 	serviceAddress := os.Getenv("ADDRESS")
 	if serviceAddress == "" {
 		serviceAddress = ":8080"
