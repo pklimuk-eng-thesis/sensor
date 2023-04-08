@@ -6,145 +6,70 @@ import (
 	"testing"
 
 	"github.com/gin-gonic/gin"
-	sService "github.com/pklimuk-eng-thesis/sensor/pkg/service"
+	"github.com/pklimuk-eng-thesis/sensor/pkg/domain"
+	"github.com/pklimuk-eng-thesis/sensor/pkg/service"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
 )
 
-type mockService struct {
-	mock.Mock
+func TestSensorHandler_GetInfo(t *testing.T) {
+	// Create a new mock sensor service and set the expected behavior
+	sensorService := new(service.MockSensorService)
+	expectedSensor := &domain.Sensor{Enabled: true, Detected: true}
+	sensorService.EXPECT().GetInfo().Return(expectedSensor)
+
+	// Create a new sensor handler with the mock service
+	handler := NewSensorHandler(sensorService)
+
+	// Create a new Gin context and execute the handler
+	w := httptest.NewRecorder()
+	c, _ := gin.CreateTestContext(w)
+	handler.GetInfo(c)
+
+	// Assert that the response status code is HTTP 200 OK and the JSON response body matches the expected sensor
+	assert.Equal(t, http.StatusOK, w.Code)
+	assert.JSONEq(t, `{"enabled":true,"detected":true}`, w.Body.String())
 }
 
-func (m *mockService) Detected() (bool, error) {
-	args := m.Called()
-	return args.Bool(0), args.Error(1)
-}
+func TestSensorHandler_ToggleDetected(t *testing.T) {
+	sensorService := new(service.MockSensorService)
+	expectedSensor := &domain.Sensor{Enabled: true, Detected: false}
+	sensorService.EXPECT().ToggleDetected().Return(expectedSensor, nil)
 
-func (m *mockService) IsSensorEnabled() bool {
-	args := m.Called()
-	return args.Bool(0)
-}
+	handler := NewSensorHandler(sensorService)
 
-func (m *mockService) ToggleDetected() (bool, error) {
-	args := m.Called()
-	return args.Bool(0), args.Error(1)
-}
+	w := httptest.NewRecorder()
+	c, _ := gin.CreateTestContext(w)
+	handler.ToggleDetected(c)
 
-func (m *mockService) ToggleSensorEnabled() bool {
-	args := m.Called()
-	return args.Bool(0)
-}
-
-func TestSensorHandler_Detected_Success(t *testing.T) {
-	gin.SetMode(gin.TestMode)
-	mockSvc := new(mockService)
-	handler := NewSensorHandler(mockSvc)
-
-	r := gin.Default()
-	r.GET(detectedEndpoint, handler.Detected)
-
-	t.Run("success", func(t *testing.T) {
-		mockSvc.On("Detected").Return(true, nil)
-		req, _ := http.NewRequest(http.MethodGet, detectedEndpoint, nil)
-		w := httptest.NewRecorder()
-		r.ServeHTTP(w, req)
-
-		assert.Equal(t, http.StatusOK, w.Code)
-		assert.Equal(t, "true", w.Body.String())
-	})
-}
-
-func TestSensorHandler_Detected_Error(t *testing.T) {
-	gin.SetMode(gin.TestMode)
-	mockSvc := new(mockService)
-	handler := NewSensorHandler(mockSvc)
-
-	r := gin.Default()
-	r.GET(detectedEndpoint, handler.Detected)
-
-	t.Run("service error", func(t *testing.T) {
-		mockSvc.On("Detected").Return(false, sService.ErrSensorIsDisabled)
-		req, _ := http.NewRequest(http.MethodGet, detectedEndpoint, nil)
-		w := httptest.NewRecorder()
-		r.ServeHTTP(w, req)
-
-		assert.Equal(t, http.StatusBadRequest, w.Code)
-		assert.Equal(t, sService.ErrSensorIsDisabled.Error(), w.Body.String())
-	})
-}
-
-func TestSensorHandler_IsSensorEnabled(t *testing.T) {
-	gin.SetMode(gin.TestMode)
-	mockSvc := new(mockService)
-	handler := NewSensorHandler(mockSvc)
-
-	r := gin.Default()
-	r.GET(enabledEndpoint, handler.IsSensorEnabled)
-
-	t.Run("success", func(t *testing.T) {
-		mockSvc.On("IsSensorEnabled").Return(true)
-		req, _ := http.NewRequest(http.MethodGet, enabledEndpoint, nil)
-		w := httptest.NewRecorder()
-		r.ServeHTTP(w, req)
-
-		assert.Equal(t, http.StatusOK, w.Code)
-		assert.Equal(t, "true", w.Body.String())
-	})
-}
-
-func TestSensorHandler_ToggleDetected_Success(t *testing.T) {
-	gin.SetMode(gin.TestMode)
-	mockSvc := new(mockService)
-	handler := NewSensorHandler(mockSvc)
-
-	r := gin.Default()
-	r.POST(detectedEndpoint, handler.ToggleDetected)
-
-	t.Run("success", func(t *testing.T) {
-		mockSvc.On("ToggleDetected").Return(true, nil)
-		req, _ := http.NewRequest(http.MethodPost, detectedEndpoint, nil)
-		w := httptest.NewRecorder()
-		r.ServeHTTP(w, req)
-
-		assert.Equal(t, http.StatusOK, w.Code)
-		assert.Equal(t, "true", w.Body.String())
-	})
+	assert.Equal(t, http.StatusOK, w.Code)
+	assert.JSONEq(t, `{"enabled":true,"detected":false}`, w.Body.String())
 }
 
 func TestSensorHandler_ToggleDetected_Error(t *testing.T) {
-	gin.SetMode(gin.TestMode)
-	mockSvc := new(mockService)
-	handler := NewSensorHandler(mockSvc)
+	sensorService := new(service.MockSensorService)
+	sensorService.EXPECT().ToggleDetected().Return(nil, service.ErrSensorIsDisabled)
 
-	r := gin.Default()
-	r.POST(detectedEndpoint, handler.ToggleDetected)
+	handler := NewSensorHandler(sensorService)
 
-	t.Run("service error", func(t *testing.T) {
-		mockSvc.On("ToggleDetected").Return(false, sService.ErrSensorIsDisabled)
-		req, _ := http.NewRequest(http.MethodPost, detectedEndpoint, nil)
-		w := httptest.NewRecorder()
-		r.ServeHTTP(w, req)
+	w := httptest.NewRecorder()
+	c, _ := gin.CreateTestContext(w)
+	handler.ToggleDetected(c)
 
-		assert.Equal(t, http.StatusBadRequest, w.Code)
-		assert.Equal(t, sService.ErrSensorIsDisabled.Error(), w.Body.String())
-	})
+	assert.Equal(t, http.StatusInternalServerError, w.Code)
+	assert.Equal(t, service.ErrSensorIsDisabled.Error(), w.Body.String())
 }
 
 func TestSensorHandler_ToggleSensorEnabled(t *testing.T) {
-	gin.SetMode(gin.TestMode)
-	mockSvc := new(mockService)
-	handler := NewSensorHandler(mockSvc)
+	sensorService := new(service.MockSensorService)
+	expectedSensor := &domain.Sensor{Enabled: false, Detected: false}
+	sensorService.EXPECT().ToggleSensorEnabled().Return(expectedSensor)
 
-	r := gin.Default()
-	r.POST(enabledEndpoint, handler.ToggleSensorEnabled)
+	handler := NewSensorHandler(sensorService)
 
-	t.Run("success", func(t *testing.T) {
-		mockSvc.On("ToggleSensorEnabled").Return(true)
-		req, _ := http.NewRequest(http.MethodPost, enabledEndpoint, nil)
-		w := httptest.NewRecorder()
-		r.ServeHTTP(w, req)
+	w := httptest.NewRecorder()
+	c, _ := gin.CreateTestContext(w)
+	handler.ToggleSensorEnabled(c)
 
-		assert.Equal(t, http.StatusOK, w.Code)
-		assert.Equal(t, "true", w.Body.String())
-	})
+	assert.Equal(t, http.StatusOK, w.Code)
+	assert.JSONEq(t, `{"enabled":false,"detected":false}`, w.Body.String())
 }

@@ -15,30 +15,21 @@ func NewSensorHandler(service sService.SensorService) *SensorHandler {
 	return &SensorHandler{service}
 }
 
-func (h *SensorHandler) Detected(c *gin.Context) {
-	detected, err := h.service.Detected()
-	if err != nil {
-		c.String(http.StatusBadRequest, err.Error())
-		return
-	}
-	c.IndentedJSON(http.StatusOK, &detected)
-}
-
-func (h *SensorHandler) IsSensorEnabled(c *gin.Context) {
-	sensorEnabled := h.service.IsSensorEnabled()
-	c.IndentedJSON(http.StatusOK, &sensorEnabled)
+func (h *SensorHandler) GetInfo(c *gin.Context) {
+	sensor := h.service.GetInfo()
+	c.IndentedJSON(http.StatusOK, &sensor)
 }
 
 func (h *SensorHandler) ToggleDetected(c *gin.Context) {
-	detected, err := h.service.ToggleDetected()
+	sensor, err := h.service.ToggleDetected()
 	if err != nil {
-		c.String(http.StatusBadRequest, err.Error())
+		c.String(http.StatusInternalServerError, err.Error())
 		return
 	}
-	c.IndentedJSON(http.StatusOK, &detected)
+	c.IndentedJSON(http.StatusOK, &sensor)
 }
 
 func (h *SensorHandler) ToggleSensorEnabled(c *gin.Context) {
-	sensorEnabled := h.service.ToggleSensorEnabled()
-	c.IndentedJSON(http.StatusOK, &sensorEnabled)
+	sensor := h.service.ToggleSensorEnabled()
+	c.IndentedJSON(http.StatusOK, &sensor)
 }

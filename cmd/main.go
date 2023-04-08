@@ -33,7 +33,7 @@ func main() {
 
 	serviceAddress := os.Getenv("ADDRESS")
 	if serviceAddress == "" {
-		serviceAddress = ":8080"
+		serviceAddress = ":8081"
 	}
 	log.Printf("Starting service at %s\n", serviceAddress)
 	log.Fatal(r.Run(serviceAddress))
