@@ -1,4 +1,4 @@
-package pkg
+package service
 
 import (
 	"errors"
@@ -8,11 +8,11 @@ import (
 
 var ErrSensorIsDisabled = errors.New("Sensor is disabled")
 
+//go:generate --name SensorService --output mock_sensorService.go
 type SensorService interface {
-	Detected() (bool, error)
-	IsSensorEnabled() bool
-	ToggleDetected() (bool, error)
-	ToggleSensorEnabled() bool
+	GetInfo() *domain.Sensor
+	ToggleDetected() (*domain.Sensor, error)
+	ToggleSensorEnabled() *domain.Sensor
 }
 
 type sensorService struct {
@@ -25,26 +25,23 @@ func NewSensorService(sensor *domain.Sensor) SensorService {
 	}
 }
 
-func (s *sensorService) Detected() (bool, error) {
-	if !s.sensor.Enabled {
-		return false, ErrSensorIsDisabled
-	}
-	return s.sensor.Detected, nil
+func (s *sensorService) GetInfo() *domain.Sensor {
+	return s.sensor
 }
 
-func (s *sensorService) IsSensorEnabled() bool {
-	return s.sensor.Enabled
-}
-
-func (s *sensorService) ToggleDetected() (bool, error) {
+func (s *sensorService) ToggleDetected() (*domain.Sensor, error) {
 	if !s.sensor.Enabled {
-		return false, ErrSensorIsDisabled
+		s.sensor.Detected = false
+		return s.sensor, ErrSensorIsDisabled
 	}
 	s.sensor.Detected = !s.sensor.Detected
-	return s.sensor.Detected, nil
+	return s.sensor, nil
 }
 
-func (s *sensorService) ToggleSensorEnabled() bool {
+func (s *sensorService) ToggleSensorEnabled() *domain.Sensor {
 	s.sensor.Enabled = !s.sensor.Enabled
-	return s.sensor.Enabled
+	if !s.sensor.Enabled {
+		s.sensor.Detected = false
+	}
+	return s.sensor
 }
