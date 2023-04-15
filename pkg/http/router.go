@@ -8,6 +8,6 @@ var getInfoEndpoint = "/info"
 
 func SetupRouter(r *gin.Engine, h *SensorHandler) {
 	r.GET(getInfoEndpoint, h.GetInfo)
-	r.POST(detectedEndpoint, h.ToggleDetected)
-	r.POST(enabledEndpoint, h.ToggleSensorEnabled)
+	r.PATCH(detectedEndpoint, h.ToggleDetected)
+	r.PATCH(enabledEndpoint, h.ToggleSensorEnabled)
 }
