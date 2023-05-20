@@ -4,11 +4,21 @@ import (
 	"testing"
 
 	"github.com/pklimuk-eng-thesis/sensor/pkg/domain"
+	"github.com/stretchr/testify/assert"
 )
 
 var sensorEnabledDetected = &domain.Sensor{Enabled: true, Detected: true}
 var sensorEnabledNotDetected = &domain.Sensor{Enabled: true, Detected: false}
 var sensorDisabledNotDetected = &domain.Sensor{Enabled: false, Detected: false}
+
+func Test_SensorService_NewSensorService(t *testing.T) {
+	sensor := &domain.Sensor{
+		Enabled:  true,
+		Detected: false,
+	}
+	sensorService := NewSensorService(sensor)
+	assert.NotNil(t, sensorService)
+}
 
 func Test_SensorService_GetInfo(t *testing.T) {
 	tests := []struct {
